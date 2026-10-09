@@ -1,0 +1,114 @@
+<div 
+  class="modal-backdrop" 
+  (click)="onBackdropClick($event)" 
+  role="dialog" 
+  aria-modal="true" 
+  [attr.aria-label]="image.title"
+>
+  <div class="modal-dialog">
+    <!-- Botón cerrar -->
+    <button type="button" class="close-btn" (click)="onClose()" aria-label="Cerrar vista ampliada">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+
+    <!-- Navegación Izquierda -->
+    <button 
+      type="button" 
+      class="nav-btn prev-btn" 
+      (click)="onPrevious()" 
+      aria-label="Imagen anterior (flecha izquierda)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Contenido Principal -->
+    <div class="modal-content-card">
+      <div class="modal-image-area">
+        <img 
+          [src]="image.url" 
+          [alt]="image.title" 
+          (error)="onImageError($event)"
+          class="expanded-image"
+        />
+        <div class="counter-badge">
+          {{ currentIndex + 1 }} / {{ totalCount }}
+        </div>
+      </div>
+
+      <div class="modal-details-area">
+        <div class="details-header">
+          <div>
+            <span class="category-pill">{{ image.category }}</span>
+            <h2 class="modal-title">{{ image.title }}</h2>
+          </div>
+          <button 
+            type="button"
+            class="like-btn" 
+            [class.liked]="image.liked" 
+            (click)="onToggleLike()"
+            [attr.aria-label]="image.liked ? 'Quitar me gusta' : 'Dar me gusta'"
+          >
+            <svg class="heart-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span>{{ image.likes }}</span>
+          </button>
+        </div>
+
+        <p class="modal-description">{{ image.description }}</p>
+
+        <div class="tags-row">
+          @for (tag of image.tags; track tag) {
+            <span class="tag">#{{ tag }}</span>
+          }
+        </div>
+
+        <div class="meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">Fotógrafo / Autor:</span>
+            <span class="meta-val">{{ image.author }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Fecha de captura:</span>
+            <span class="meta-val">{{ image.date }}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Resolución:</span>
+            <span class="meta-val">Alta definición (Full HD)</span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <a [href]="image.url" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            Ver original
+          </a>
+          <button type="button" class="btn btn-primary" (click)="onClose()">
+            Volver a la galería
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación Derecha -->
+    <button 
+      type="button" 
+      class="nav-btn next-btn" 
+      (click)="onNext()" 
+      aria-label="Siguiente imagen (flecha derecha)"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </div>
+</div>

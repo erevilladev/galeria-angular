@@ -1,59 +1,110 @@
-# GaleriaAngular
+# Galería Fotográfica Interactiva (Angular SPA)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+**Asignatura:** Desarrollo de Aplicaciones en Red II  
+**Actividad:** Actividad 2 Individual - Creación de una galería  
+**Estudiante:** Brayian Ramirez Revilla  
+**Fecha de entrega:** 12/10/26  
 
-## Development server
+---
 
-To start a local development server, run:
+## 📌 Descripción del Proyecto
 
+Esta aplicación es una Single Page Application (SPA) desarrollada con el framework **Angular** y **TypeScript**. Implementa una galería de imágenes interactiva, moderna y totalmente adaptativa (*responsive*), diseñada bajo una arquitectura modular basada en componentes independientes.
+
+### 🚀 Características y Funcionalidades
+1. **Estructura en Componentes:**
+   - `GalleryComponent`: Componente contenedor principal que gestiona el estado, filtros, ordenación y ciclo de vida de la galería.
+   - `ImageCardComponent`: Componente individual para representar cada tarjeta de imagen con efectos visuales, metadatos y botones de interacción.
+   - `ImageModalComponent`: Lightbox/Modal de alta definición para visualización ampliada con controles de navegación (anterior/siguiente), soporte para teclado (`ArrowLeft`, `ArrowRight`, `Escape`) y cierre al hacer clic fuera.
+2. **Carga Dinámica:** Las imágenes y sus metadatos (título, descripción, categoría, autor, fecha, etiquetas, likes) se gestionan desde un array tipado en un servicio Angular (`ImageService`), cumpliendo con la exigencia de no cargarlas directamente en el HTML.
+3. **Interacción con el Usuario:**
+   - Lightbox modal con navegación secuencial.
+   - Sistema de "Me gusta" (Likes) reactivo con animación y contador dinámico.
+   - Filtrado en tiempo real por categorías temáticas (Naturaleza, Arquitectura, Tecnología, Viajes, Arte).
+   - Buscador por texto predictivo y filtros de ordenación (por likes o alfabético).
+4. **Diseño Responsive:** Grid fluido en CSS puro (`CSS Grid` y `Flexbox`) con adaptación automática a pantallas móviles, tablets y monitores de escritorio.
+
+---
+
+## 🛠️ Requisitos Previos e Instalación
+
+Para ejecutar este proyecto en local se requiere:
+- **Node.js** (versión 18+ o superior)
+- **npm** (versión 9+ o superior)
+
+### Pasos de instalación:
 ```bash
-ng serve
+# Entrar a la carpeta del proyecto
+cd galeria-angular
+
+# Instalar dependencias
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+## 💻 Ejecución en Entorno Local
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+Para iniciar el servidor de desarrollo local:
 ```bash
-ng generate component component-name
+npm start
+```
+Abre tu navegador y accede a `http://localhost:4200/`. La aplicación se recargará automáticamente al modificar los archivos de código fuente.
+
+---
+
+## 🌐 Despliegue en GitHub Pages (Paso a Paso)
+
+Dado que el despliegue a GitHub Pages lo realizarás de forma manual, sigue estos sencillos pasos:
+
+### 1. Inicializar y subir el repositorio a tu cuenta de GitHub
+```bash
+# Si no has creado el repositorio en GitHub, créalo con el nombre: galeria-angular
+git init
+git add .
+git commit -m "feat: implementacion completa de galeria interactiva Angular"
+git branch -M main
+git remote add origin https://github.com/TU_USUARIO/galeria-angular.git
+git push -u origin main
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+### 2. Compilar con la base-href de tu repositorio
 ```bash
-ng generate --help
+npm run build:gh
 ```
+*(Nota: Si tu repositorio tiene otro nombre distinto a `galeria-angular`, ejecuta `npx ng build --base-href=/NOMBRE_DE_TU_REPOSITORIO/`)*.
 
-## Building
-
-To build the project run:
-
+### 3. Publicar automáticamente a la rama `gh-pages`
 ```bash
-ng build
+npm run deploy
 ```
+Este comando ejecuta `angular-cli-ghpages`, el cual publicará la carpeta `dist/galeria-angular/browser` directamente en la rama `gh-pages` de tu repositorio.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### 4. Activar GitHub Pages en el repositorio
+1. Entra a tu repositorio en GitHub: `https://github.com/TU_USUARIO/galeria-angular`.
+2. Ve a **Settings** -> **Pages**.
+3. En **Build and deployment** > **Branch**, asegúrate de que esté seleccionada la rama `gh-pages` y la carpeta `/ (root)`.
+4. En pocos minutos, tu sitio estará accesible en:
+   `https://TU_USUARIO.github.io/galeria-angular/`
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 📁 Estructura del Código
 
-```bash
-ng test
+```text
+src/
+├── app/
+│   ├── components/
+│   │   ├── gallery/          # Componente principal de la galería
+│   │   ├── image-card/       # Componente individual de imagen
+│   │   └── image-modal/      # Lightbox/Modal de vista ampliada
+│   ├── models/
+│   │   └── image.model.ts    # Interface TypeScript ImageItem
+│   ├── services/
+│   │   └── image.service.ts  # Servicio de datos con array tipado
+│   ├── app.ts                # Componente raíz
+│   ├── app.html              # Layout con navbar y footer
+│   └── app.css               # Estilos del layout principal
+├── styles.css                # Estilos globales y variables
+└── index.html                # Plantilla base SPA
 ```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
