@@ -53,11 +53,6 @@ export class GalleryComponent {
     return items;
   });
 
-  readonly selectedImageIndex = computed(() => {
-    const current = this.selectedImage();
-    return current ? this.filteredImages().findIndex(img => img.id === current.id) : -1;
-  });
-
   getCategoryCount(category: string): number {
     if (category === 'Todas') return this.allImages().length;
     return this.allImages().filter(img => img.category === category).length;
@@ -65,26 +60,35 @@ export class GalleryComponent {
 
   openModal(image: ImageItem): void {
     this.selectedImage.set(image);
-    document.body.style.overflow = 'hidden';
   }
 
   closeModal(): void {
     this.selectedImage.set(null);
-    document.body.style.overflow = '';
+  }
+
+  currentIndex(): number {
+    const current = this.selectedImage();
+    return current ? this.filteredImages().findIndex(img => img.id === current.id) : 0;
   }
 
   nextImage(): void {
     const list = this.filteredImages();
-    if (!list.length) return;
-    const nextIdx = (this.selectedImageIndex() + 1) % list.length;
-    this.selectedImage.set(list[nextIdx]);
+    const current = this.selectedImage();
+    if (!list.length || !current) return;
+
+    const currentIndex = list.findIndex(img => img.id === current.id);
+    const nextIndex = (currentIndex + 1) % list.length;
+    this.selectedImage.set(list[nextIndex]);
   }
 
   previousImage(): void {
     const list = this.filteredImages();
-    if (!list.length) return;
-    const prevIdx = (this.selectedImageIndex() - 1 + list.length) % list.length;
-    this.selectedImage.set(list[prevIdx]);
+    const current = this.selectedImage();
+    if (!list.length || !current) return;
+
+    const currentIndex = list.findIndex(img => img.id === current.id);
+    const prevIndex = (currentIndex - 1 + list.length) % list.length;
+    this.selectedImage.set(list[prevIndex]);
   }
 
   handleToggleLike(id: number): void {

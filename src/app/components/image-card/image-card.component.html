@@ -1,12 +1,18 @@
 <article class="card" (click)="onCardClick()" tabindex="0" role="button" (keydown.enter)="onCardClick()" (keydown.space)="onCardClick()" [attr.aria-label]="'Abrir ' + image.title">
   <div class="media-container">
-    <img 
-      [src]="image.thumbnailUrl" 
-      [alt]="image.title" 
-      loading="lazy" 
-      (error)="onImageError($event)"
-      class="media-image"
-    />
+    @if (!imageError()) {
+      <img 
+        [src]="image.thumbnailUrl" 
+        [alt]="image.title" 
+        loading="lazy" 
+        (error)="onImageError()"
+        class="media-image"
+      />
+    } @else {
+      <div class="media-fallback">
+        <span>Imagen no disponible</span>
+      </div>
+    }
     <span class="media-tag">{{ image.category }}</span>
   </div>
 
