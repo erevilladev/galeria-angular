@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ImageService } from '../../services/image.service';
@@ -13,59 +13,30 @@ import { ImageModalComponent } from '../image-modal/image-modal.component';
   templateUrl: './gallery.component.html',
   styleUrl: './gallery.component.css'
 })
-export class GalleryComponent implements OnInit {
-  private imageService = inject(ImageService);
+export class GalleryComponent {
+  private readonly imageService = inject(ImageService);
 
-  allImages: ImageItem[] = [];
-  filteredImages: ImageItem[] = [];
-  categories: string[] = [];
+  readonly allImages = signal<ImageItem[]>(this.imageService.getImages());
+  readonly categories = this.imageService.getCategories();
 
-  selectedCategory: string = 'Todas';
-  searchTerm: string = '';
-  sortBy: 'default' | 'likes' | 'title' = 'default';
+  readonly selectedCategory = signal<string>('Todas');
+  readonly searchTerm = signal<string>('');
+  readonly sortBy = signal<'default' | 'likes' | 'title'>('default');
 
-  // Control del modal
-  selectedImage: ImageItem | null = null;
-  selectedImageIndex: number = -1;
+  readonly selectedImage = signal<ImageItem | null>(null);
 
-  ngOnInit(): void {
-    this.allImages = this.imageService.getImages();
-    this.categories = this.imageService.getCategories();
-    this.applyFilters();
-  }
+  readonly filteredImages = computed(() => {
+    let items = this.allImages();
+    const cat = this.selectedCategory();
+    const query = this.searchTerm().trim().toLowerCase();
+    const sort = this.sortBy();
 
-  onCategoryChange(cat: string): void {
-    this.selectedCategory = cat;
-    this.applyFilters();
-  }
-
-  onSearchChange(): void {
-    this.applyFilters();
-  }
-
-  onSortChange(): void {
-    this.applyFilters();
-  }
-
-  resetFilters(): void {
-    this.selectedCategory = 'Todas';
-    this.searchTerm = '';
-    this.sortBy = 'default';
-    this.applyFilters();
-  }
-
-  applyFilters(): void {
-    let result = [...this.allImages];
-
-    // Filtro por categoría
-    if (this.selectedCategory !== 'Todas') {
-      result = result.filter(img => img.category === this.selectedCategory);
+    if (cat !== 'Todas') {
+      items = items.filter(img => img.category === cat);
     }
 
-    // Filtro por término de búsqueda (título, descripción o tags)
-    if (this.searchTerm.trim() !== '') {
-      const query = this.searchTerm.toLowerCase().trim();
-      result = result.filter(img => 
+    if (query) {
+      items = items.filter(img =>
         img.title.toLowerCase().includes(query) ||
         img.description.toLowerCase().includes(query) ||
         img.tags.some(tag => tag.toLowerCase().includes(query)) ||
@@ -73,69 +44,62 @@ export class GalleryComponent implements OnInit {
       );
     }
 
-    // Ordenación
-    if (this.sortBy === 'likes') {
-      result.sort((a, b) => b.likes - a.likes);
-    } else if (this.sortBy === 'title') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
+    if (sort === 'likes') {
+      return [...items].sort((a, b) => b.likes - a.likes);
     }
-
-    this.filteredImages = result;
-
-    // Si el modal está abierto, sincronizar índice
-    if (this.selectedImage) {
-      this.selectedImageIndex = this.filteredImages.findIndex(img => img.id === this.selectedImage?.id);
+    if (sort === 'title') {
+      return [...items].sort((a, b) => a.title.localeCompare(b.title));
     }
-  }
+    return items;
+  });
+
+  readonly selectedImageIndex = computed(() => {
+    const current = this.selectedImage();
+    return current ? this.filteredImages().findIndex(img => img.id === current.id) : -1;
+  });
 
   getCategoryCount(category: string): number {
-    if (category === 'Todas') {
-      return this.allImages.length;
-    }
-    return this.allImages.filter(img => img.category === category).length;
+    if (category === 'Todas') return this.allImages().length;
+    return this.allImages().filter(img => img.category === category).length;
   }
 
   openModal(image: ImageItem): void {
-    this.selectedImage = image;
-    this.selectedImageIndex = this.filteredImages.findIndex(img => img.id === image.id);
-    document.body.style.overflow = 'hidden'; // Evitar scroll del fondo
+    this.selectedImage.set(image);
+    document.body.style.overflow = 'hidden';
   }
 
   closeModal(): void {
-    this.selectedImage = null;
-    this.selectedImageIndex = -1;
+    this.selectedImage.set(null);
     document.body.style.overflow = '';
   }
 
   nextImage(): void {
-    if (this.filteredImages.length === 0) return;
-    this.selectedImageIndex = (this.selectedImageIndex + 1) % this.filteredImages.length;
-    this.selectedImage = this.filteredImages[this.selectedImageIndex];
+    const list = this.filteredImages();
+    if (!list.length) return;
+    const nextIdx = (this.selectedImageIndex() + 1) % list.length;
+    this.selectedImage.set(list[nextIdx]);
   }
 
   previousImage(): void {
-    if (this.filteredImages.length === 0) return;
-    this.selectedImageIndex = (this.selectedImageIndex - 1 + this.filteredImages.length) % this.filteredImages.length;
-    this.selectedImage = this.filteredImages[this.selectedImageIndex];
+    const list = this.filteredImages();
+    if (!list.length) return;
+    const prevIdx = (this.selectedImageIndex() - 1 + list.length) % list.length;
+    this.selectedImage.set(list[prevIdx]);
   }
 
   handleToggleLike(id: number): void {
     const updated = this.imageService.toggleLike(id);
-    if (updated) {
-      // Actualizar en el array maestro
-      const idxAll = this.allImages.findIndex(img => img.id === id);
-      if (idxAll !== -1) {
-        this.allImages[idxAll] = updated;
-      }
-      // Actualizar en filtrados
-      const idxFilt = this.filteredImages.findIndex(img => img.id === id);
-      if (idxFilt !== -1) {
-        this.filteredImages[idxFilt] = updated;
-      }
-      // Actualizar modal si está abierto
-      if (this.selectedImage && this.selectedImage.id === id) {
-        this.selectedImage = updated;
-      }
+    if (!updated) return;
+
+    this.allImages.update(items => items.map(img => img.id === id ? updated : img));
+    if (this.selectedImage()?.id === id) {
+      this.selectedImage.set(updated);
     }
+  }
+
+  resetFilters(): void {
+    this.selectedCategory.set('Todas');
+    this.searchTerm.set('');
+    this.sortBy.set('default');
   }
 }
