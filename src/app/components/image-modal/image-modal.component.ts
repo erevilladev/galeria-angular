@@ -11,8 +11,6 @@ import { ImageItem } from '../../models/image.model';
 })
 export class ImageModalComponent {
   @Input({ required: true }) image!: ImageItem;
-  @Input() currentIndex: number = 0;
-  @Input() totalCount: number = 0;
 
   @Output() close = new EventEmitter<void>();
   @Output() next = new EventEmitter<void>();

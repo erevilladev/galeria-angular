@@ -94,8 +94,6 @@
   @if (selectedImage()) {
     <app-image-modal 
       [image]="selectedImage()!"
-      [currentIndex]="currentIndex()"
-      [totalCount]="filteredImages().length"
       (close)="closeModal()"
       (next)="nextImage()"
       (previous)="previousImage()"

@@ -66,29 +66,22 @@ export class GalleryComponent {
     this.selectedImage.set(null);
   }
 
-  currentIndex(): number {
-    const current = this.selectedImage();
-    return current ? this.filteredImages().findIndex(img => img.id === current.id) : 0;
-  }
-
-  nextImage(): void {
+  private navigateModal(direction: 1 | -1): void {
     const list = this.filteredImages();
     const current = this.selectedImage();
     if (!list.length || !current) return;
 
-    const currentIndex = list.findIndex(img => img.id === current.id);
-    const nextIndex = (currentIndex + 1) % list.length;
+    const index = list.findIndex(img => img.id === current.id);
+    const nextIndex = (index + direction + list.length) % list.length;
     this.selectedImage.set(list[nextIndex]);
   }
 
-  previousImage(): void {
-    const list = this.filteredImages();
-    const current = this.selectedImage();
-    if (!list.length || !current) return;
+  nextImage(): void {
+    this.navigateModal(1);
+  }
 
-    const currentIndex = list.findIndex(img => img.id === current.id);
-    const prevIndex = (currentIndex - 1 + list.length) % list.length;
-    this.selectedImage.set(list[prevIndex]);
+  previousImage(): void {
+    this.navigateModal(-1);
   }
 
   handleToggleLike(id: number): void {
